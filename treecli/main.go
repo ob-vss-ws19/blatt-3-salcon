@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello Tree-CLI!")
+	fmt.Println("Hello!")
 }
