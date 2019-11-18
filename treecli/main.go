@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
-	"github.com/AsynkronIT/protoactor-go/examples/remotewatch/messages"
+	"blatt-3-salcon/messages"
 	"github.com/AsynkronIT/protoactor-go/remote"
 	"strconv"
 	"sync"
@@ -30,15 +30,15 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 	case *messages.Response:
 		switch msg.Type {
 		case messages.CREATE:
-			fmt.Println("Id: " + msg.Key)
-			fmt.Println("Token: " + msg.Value)
+			fmt.Printf("Id: %d\n", msg.Key)
+			fmt.Printf("Token: %s\n",msg.Value)
 			wg.Done()
 		case messages.FIND:
-			fmt.Println("Value: " + msg.Key)
+			fmt.Printf("Value: %s\n",msg.Key)
 			wg.Done()
 		case messages.SUCCESS:
 			wg.Done()
-		case message.TREES:
+		case messages.TREES:
 			fmt.Println("ID's for Trees: " + msg.Value)
 			wg.Done()
 		}
@@ -129,7 +129,7 @@ func traverse() {
 
 func trees() {
 	if len(flag.Args()) != 4 {
-		printError()
+		handleError()
 		return
 	}
 	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.TREES}, pid)
