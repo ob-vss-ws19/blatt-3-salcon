@@ -68,7 +68,7 @@ func newToken() string {
 	return fmt.Sprintf("%x", bytes)
 }
 
-var bind = flag.String("bind", "localhost:8088", "Bind to address")
+var bind = flag.String("bind", "localhost:8090", "Bind to address")
 
 func main() {
 	var wg sync.WaitGroup
@@ -76,5 +76,5 @@ func main() {
 	defer wg.Wait()
 	flag.Parse()
 	remote.Start(*bind)
-	remote.Register("TreeServiceActor", actor.PropsFromProducer(getTreeServiceActor))
+	remote.Register("treeservice", actor.PropsFromProducer(getTreeServiceActor))
 }
