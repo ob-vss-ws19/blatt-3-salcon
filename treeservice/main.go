@@ -2,7 +2,6 @@ package main
 
 import (
 	"blatt-3-salcon/messages"
-	"blatt-3-salcon/tree"
 	"crypto/rand"
 	"flag"
 	"fmt"
@@ -15,6 +14,8 @@ type TreeServiceActor struct {
 }
 
 var createdID = 1
+var alltrees = make(map[int]*actor.PID)
+var tokens = make(map[string]int)
 
 // Kümmert sich darum, dass die Funktionalitäen
 func (state *TreeServiceActor) Receive(context actor.Context) {
@@ -27,12 +28,16 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 			}
 
 			// Neue ID erhalten für Node
-			id := createdID
-			createdID++
+			//newid := createdID
+			//createdID++
+			//
+			//props := actor.PropsFromProducer(func() actor.Actor {
+			//	return &tree.Node{ LeafSize: int(msg.LeafSize) }
+			//})
 
-			props := actor.PropsFromProducer(func() actor.Actor {
-				return &tree.Node{LeafSize: int(msg.LeafSize)}
-			})
+			//pid := context.Spawn(props)
+
+			//alltrees[newid] =
 
 		case messages.FIND:
 
