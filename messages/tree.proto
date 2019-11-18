@@ -7,14 +7,14 @@ message Error {
 }
 
 enum Usage {
-    CREATE = 0;
+    CREATETREE = 0;
     ADD = 1;
     FIND = 2;
     REMOVE = 3;
     TRAVERSE = 4;
     DELETE = 5;
     SUCCESS = 6;
-    TREES = 7;
+    ALLTREES = 7;
 }
 
 message Request {
