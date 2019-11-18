@@ -1,10 +1,10 @@
 package main
 
 import (
+	"blatt-3-salcon/messages"
 	"flag"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
-	"blatt-3-salcon/messages"
 	"github.com/AsynkronIT/protoactor-go/remote"
 	"strconv"
 	"sync"
@@ -29,22 +29,27 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
 	case *messages.Response:
 		switch msg.Type {
-		case messages.CREATE:
+		case messages.CREATETREE:
 			fmt.Printf("Id: %d\n", msg.Key)
-			fmt.Printf("Token: %s\n",msg.Value)
+			fmt.Printf("Token: %s\n", msg.Value)
 			wg.Done()
 		case messages.FIND:
-			fmt.Printf("Value: %s\n",msg.Key)
+			fmt.Printf("Value: %s\n", msg.Key)
 			wg.Done()
 		case messages.SUCCESS:
 			wg.Done()
-		case messages.TREES:
+		case messages.ALLTREES:
 			fmt.Println("ID's for Trees: " + msg.Value)
 			wg.Done()
 		}
-
 	case *messages.Traverse:
-		//TODO
+		for i, pair := range msg.Values {
+			fmt.Printf("{%d,%s}", pair.Key, pair.Value)
+			if i < len(msg.Values)-1 {
+				fmt.Printf(",")
+			}
+		}
+		fmt.Printf("\n")
 		wg.Done()
 	case *messages.Error:
 		fmt.Println(msg.Message + "\n")
@@ -55,7 +60,6 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 // Command Line Interface
 func main() {
 	fmt.Println("Hello Tree-CLI!")
-
 	remote.Start(*flagBind)
 	//siehe folie
 	rootContext = actor.EmptyRootContext //initliaze empty root context
@@ -124,7 +128,11 @@ func remove() {
 }
 
 func traverse() {
-	//TODO
+	if len(flag.Args()) > 1 || isNotValid(id, token) {
+		handleError()
+		return
+	}
+	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.TRAVERSE, Token: *token, Id: int32(*id)}, pid)
 }
 
 func trees() {
@@ -132,7 +140,7 @@ func trees() {
 		handleError()
 		return
 	}
-	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.TREES}, pid)
+	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.ALLTREES}, pid)
 }
 
 func newTree() {
@@ -141,7 +149,7 @@ func newTree() {
 		return
 	}
 	tmp, _ := strconv.Atoi(flag.Args()[1])
-	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.CREATE, Id: int32(tmp)}, pid)
+	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.CREATETREE, Id: int32(tmp)}, pid)
 }
 
 func deleteTree() {
