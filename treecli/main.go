@@ -17,8 +17,8 @@ var (
 	pid         *actor.PID
 	remotePid   *actor.PID
 	wg          sync.WaitGroup //A WaitGroup waits for a collection of goroutines to finish.
-	flagBind    = flag.String("bind", "localhost:8080", "Bind to Address")
-	flagRemote  = flag.String("remote", "localhost:8080", "remote host:port")
+	flagBind    = flag.String("bind", "localhost:8090", "Bind to Address")
+	flagRemote  = flag.String("remote", "localhost:8091", "remote host:port")
 	forceDelete = flag.Bool("no-preserve-tree", false, "force deletion of tree")
 	rootContext *actor.RootContext
 )
