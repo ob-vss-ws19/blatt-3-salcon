@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"blatt-3-salcon/messages"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"sort"
@@ -29,7 +30,7 @@ type Find struct {
 func (state *Node) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
 	case *Add:
-		fmt.Printf("# ADD: Got Request for %d -> %s", msg.Key, msg.Val)
+		fmt.Printf("# ADD: Got Request for %d -> %s\n", msg.Key, msg.Val)
 		// Fall 1: Platz im Node und noch keine Teilbäume
 		if state.LeftNode == nil && state.RightNode == nil && state.LeafSize > len(state.Data) {
 			// Fall 1.1: Noch kein Data angelegt
@@ -75,11 +76,13 @@ func (state *Node) Receive(context actor.Context) {
 			}
 		}
 	case *Find:
-		fmt.Printf("# FIND: Got Request for %d -> %s", msg.Key)
-		if state.Data == nil {
+		fmt.Printf("# FIND: Got Request for %d\n", msg.Key)
+		if state.Data != nil {
+			context.Send(msg.RequestFrom, &messages.Error{Message: fmt.Sprintf("# FIND: Could not find the key %s", msg.Key)})
+
+		} else {
 
 		}
-
 	}
 
 }
