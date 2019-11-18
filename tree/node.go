@@ -3,12 +3,13 @@ package tree
 import (
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
+	"sort"
 )
 
 // Jeder Knoten ist ein eigener Actor
 type Node struct {
-	LeftNode  *actor.Actor
-	RightNode *actor.Actor
+	LeftNode  *actor.PID
+	RightNode *actor.PID
 	MaxKeyVal int
 	LeafSize  int
 	Data      map[int]string
@@ -23,7 +24,7 @@ type Add struct {
 func (state *Node) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
 	case *Add:
-		fmt.Printf("# ADD: %d -> %s", msg.Key, msg.Val)
+		fmt.Printf("# ADD: Got Request for %d -> %s", msg.Key, msg.Val)
 		// Fall 1: Platz im Node und noch keine Teilbäume
 		if state.LeftNode == nil && state.RightNode == nil && state.LeafSize > len(state.Data) {
 			// Fall 1.1: Noch kein Data angelegt
@@ -32,6 +33,43 @@ func (state *Node) Receive(context actor.Context) {
 			}
 			state.Data[msg.Key] = msg.Val
 			fmt.Printf("# ADD: Data successfully added to Node. PID: %s, {Key: %d, Val: %s} \n", context.Self().Address, msg.Key, msg.Val)
+			// Fall 2: Kein Platz im Node und noch keine Teilbäume
+		} else if state.LeftNode == nil && state.RightNode == nil && state.LeafSize == len(state.Data) {
+			// Erstelle zwei nodes (linke und Rechte Hälfte)
+			props := actor.PropsFromProducer(func() actor.Actor {
+				// Erstelle Node mit dem LeafSize vom Parent
+				return &Node{LeafSize: state.LeafSize}
+			})
+			// Initialisiere Linke und Rechte Node
+			state.LeftNode = context.Spawn(props)
+			state.RightNode = context.Spawn(props)
+
+			// Map in der Mitte auf die Leafs aufteilen
+			state.Data[msg.Key] = msg.Val
+
+			var keys []int
+			for key := range state.Data {
+				keys = append(keys, int(key))
+			}
+			sort.Ints(keys)
+
+			state.MaxKeyVal = keys[(len(keys)/2)-1]
+			fmt.Printf("# ADD: Maximum Key Val Left %d\n", state.MaxKeyVal)
+			for _, key := range keys {
+				// Rechts aufteilen
+				if key > state.MaxKeyVal {
+					fmt.Printf("# ADD: Set %d right\n", key)
+					context.Send(state.RightNode, &Add{Key: key, Val: state.Data[key]})
+					delete(state.Data, key)
+					// Links aufteilen
+				} else {
+					fmt.Printf("# ADD: Set %d left\n", key)
+					context.Send(state.LeftNode, &Add{Key: key, Val: state.Data[key]})
+					delete(state.Data, key)
+				}
+			}
 		}
+
 	}
+
 }

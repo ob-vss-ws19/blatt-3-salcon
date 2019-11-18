@@ -11,10 +11,9 @@ func main() {
 	props := actor.PropsFromProducer(func() actor.Actor {
 		return &tree.Node{}
 	})
-
 	pid := context.Spawn(props)
-	context.Send(pid, &tree.Test1{Message: "hi", Name: "Name"})
-
+	context.Send(pid, &tree.Add{Key: 1, Val: "Salih"})
 	fmt.Println(pid)
+	fmt.Println(context)
 
 }
