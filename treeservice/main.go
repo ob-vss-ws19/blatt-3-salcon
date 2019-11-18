@@ -9,9 +9,12 @@ import (
 func main() {
 	context := actor.EmptyRootContext
 	props := actor.PropsFromProducer(func() actor.Actor {
-		return &tree.HelloActor{}
+		return &tree.Node{}
 	})
+
 	pid := context.Spawn(props)
 	context.Send(pid, &tree.Test1{Message: "hi", Name: "Name"})
-	fmt.Println(context)
+
+	fmt.Println(pid)
+
 }
