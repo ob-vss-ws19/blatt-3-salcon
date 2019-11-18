@@ -23,6 +23,7 @@ message Request {
     Usage Type = 3;
     int32 Key = 4;
     string Value = 5;
+    int32 LeafSize = 6;
 }
 
 message Response {

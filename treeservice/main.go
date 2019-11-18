@@ -14,6 +14,9 @@ import (
 type TreeServiceActor struct {
 }
 
+var createdID = 1
+
+// Kümmert sich darum, dass die Funktionalitäen
 func (state *TreeServiceActor) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
 	case *messages.Request:
@@ -22,6 +25,15 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 			if msg.Id <= 0 {
 				context.Respond(&messages.Error{"Leaf Size should be at least 1"})
 			}
+
+			// Neue ID erhalten für Node
+			id := createdID
+			createdID++
+
+			props := actor.PropsFromProducer(func() actor.Actor {
+				return &tree.Node{LeafSize: int(msg.LeafSize)}
+			})
+
 		case messages.FIND:
 
 		case messages.ADD:
