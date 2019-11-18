@@ -20,6 +20,11 @@ type Add struct {
 	Val string
 }
 
+type Find struct {
+	RequestFrom *actor.PID
+	Key         int
+}
+
 // Implementiere Receive
 func (state *Node) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
@@ -68,6 +73,11 @@ func (state *Node) Receive(context actor.Context) {
 					delete(state.Data, key)
 				}
 			}
+		}
+	case *Find:
+		fmt.Printf("# FIND: Got Request for %d -> %s", msg.Key)
+		if state.Data == nil {
+
 		}
 
 	}
