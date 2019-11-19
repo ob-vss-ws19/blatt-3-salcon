@@ -31,7 +31,8 @@ type Find struct {
 }
 
 type Remove struct {
-	Key int
+	RequestFrom *actor.PID
+	Key         int
 }
 
 type KeyValuePair struct {
@@ -50,48 +51,49 @@ type Traverse struct {
 func (state *Node) Receive(context actor.Context) {
 	switch msg := context.Message().(type) {
 	case *Add:
-		fmt.Printf("\n# ADD: Got Request for %d -> %s\n\n", msg.Key, msg.Val)
-		// Fall 1: Platz im Node und noch keine Teilbäume
-		if state.LeftNode == nil && state.RightNode == nil && state.LeafSize > len(state.Data) {
-			// Fall 1.1: Noch kein Data angelegt
+		if (len(state.Data) < state.LeafSize || state.Data[msg.Key] != "") && state.LeftNode == nil && state.RightNode == nil {
+			// add key to leaf
 			if state.Data == nil {
 				state.Data = make(map[int]string)
 			}
 			state.Data[msg.Key] = msg.Val
-			fmt.Printf("\n# ADD: Data successfully added to Node. PID: %s, {Key: %d, Val: %s} \n\n", context.Self().Address, msg.Key, msg.Val)
-			// Fall 2: Kein Platz im Node und noch keine Teilbäume
-		} else if state.LeftNode == nil && state.RightNode == nil && state.LeafSize == len(state.Data) {
-			// Erstelle zwei nodes (linke und Rechte Hälfte)
+			fmt.Printf("added key: %d\n", msg.Key)
+
+		} else if len(state.Data) == 0 && state.LeftNode != nil && state.RightNode != nil {
+			// not a leaf
+			if msg.Key <= state.MaxKeyVal {
+				// add left
+				context.Send(state.LeftNode, msg)
+			} else {
+				// add right
+				context.Send(state.RightNode, msg)
+			}
+		} else if len(state.Data) == state.LeafSize && state.LeftNode == nil && state.RightNode == nil {
+			// leaf full create new leafs
+			fmt.Println("created new leafs")
 			props := actor.PropsFromProducer(func() actor.Actor {
-				// Erstelle Node mit dem LeafSize vom Parent
-				return &Node{LeafSize: state.LeafSize}
+				return &Node{LeafSize: int(state.LeafSize)}
 			})
-			// Initialisiere Linke und Rechte Node
 			state.LeftNode = context.Spawn(props)
+
 			state.RightNode = context.Spawn(props)
 
-			// Map in der Mitte auf die Leafs aufteilen
+			// send values to leafs
 			state.Data[msg.Key] = msg.Val
-
-			var keys []int
-			for key := range state.Data {
-				keys = append(keys, int(key))
-			}
-			sort.Ints(keys)
-
+			keys := sortKeys(state.Data)
 			state.MaxKeyVal = keys[(len(keys)/2)-1]
-			fmt.Printf("\n# ADD: Maximum Key Val Left %d\n\n", state.MaxKeyVal)
+			fmt.Printf("left max key %d\n", state.MaxKeyVal)
 			for _, key := range keys {
-				// Rechts aufteilen
-				if key < state.MaxKeyVal {
-					fmt.Printf("\n# ADD: Set %d left\n\n", key)
+				if key <= state.MaxKeyVal {
+					// add half left
+					fmt.Printf("send %d left\n", key)
 					context.Send(state.LeftNode, &Add{Key: key, Val: state.Data[key]})
 					delete(state.Data, key)
 				} else {
-					fmt.Printf("\n# ADD: Set %d right\n\n", key)
+					// add half right
+					fmt.Printf("send %d right\n", key)
 					context.Send(state.RightNode, &Add{Key: key, Val: state.Data[key]})
 					delete(state.Data, key)
-					// Links aufteilen
 				}
 			}
 		}
@@ -109,7 +111,8 @@ func (state *Node) Receive(context actor.Context) {
 			}
 		} else if state.LeftNode == nil && state.RightNode == nil {
 			fmt.Printf("\n# FIND: Searching for Key %d\n", msg.Key)
-			fmt.Printf("\n# FIND: Searching in map %s\n", state.Data)
+			fmt.Print("\n# FIND: Searching in map: ")
+			fmt.Println(state.Data)
 
 			foundData := state.Data[msg.Key]
 			fmt.Printf("\n# FIND: Data found %s\n", foundData)
@@ -123,22 +126,30 @@ func (state *Node) Receive(context actor.Context) {
 		}
 
 	case *Remove:
-		fmt.Printf("\n# REMOVE: Search for key %d to remove it\n\n", msg.Key)
-		// Leaf
-		if state.Data != nil {
-			if _, ok := state.Data[msg.Key]; ok {
-				delete(state.Data, msg.Key)
-				fmt.Printf("\n # REMOVE: Key found in Tree -> Remove: %d\n\n", msg.Key)
+		fmt.Printf("\n# FIND: Got Request for %d\n\n", msg.Key)
+		// Look, it the next nodes have the key, because Datalength is 0
+		if state.LeftNode != nil && state.RightNode != nil && len(state.Data) == 0 {
+			if msg.Key <= state.MaxKeyVal {
+				// Search Left Node
+				context.Send(state.LeftNode, msg)
 			} else {
-				fmt.Printf("\n # REMOVE: Could not find Key in Tree!: %d\n\n", msg.Key)
+				// Search Right Node
+				context.Send(state.RightNode, msg)
+			}
+		} else if state.LeftNode == nil && state.RightNode == nil {
+			fmt.Printf("\n# FIND: Searching for Key %d\n", msg.Key)
+			fmt.Print("\n# FIND: Searching in map: ")
+			fmt.Println(state.Data)
+
+			foundData := state.Data[msg.Key]
+			fmt.Printf("\n# FIND: Data found %s\n", foundData)
+
+			if foundData != "" {
+				delete(state.Data, msg.Key)
+				fmt.Printf("deleted key %d\n", msg.Key)
 			}
 		} else {
-			// Inner Node
-			if msg.Key <= state.MaxKeyVal {
-				context.Send(state.LeftNode, &Remove{Key: msg.Key})
-			} else {
-				context.Send(state.RightNode, &Remove{Key: msg.Key})
-			}
+			context.Send(msg.RequestFrom, &messages.Error{Message: "# FIND: Key not found"})
 		}
 
 	case *Traverse:
@@ -222,4 +233,14 @@ func (state *Node) Receive(context actor.Context) {
 		fmt.Println("still running?")
 	}
 
+}
+
+func sortKeys(Values map[int]string) []int {
+	var keys []int
+	for k := range Values {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	return keys
 }
