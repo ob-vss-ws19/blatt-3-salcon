@@ -13,8 +13,8 @@ import (
 
 //Global Variables
 var (
-	flagBind   = flag.String("bind", "localhost:8092", "Bind to address")
-	flagRemote = flag.String("remote", "127.0.0.1:8093", "remote host:port")
+	flagBind   = flag.String("bind", "localhost:8090", "Bind to address")
+	flagRemote = flag.String("remote", "127.0.0.1:8091", "remote host:port")
 
 	id          *int
 	token       = flag.String("token", "", "tree token")
