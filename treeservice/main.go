@@ -46,8 +46,8 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 
 		case messages.FIND:
 			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
-				context.Send(pid, &tree.Find{Key: int(msg.Key)})
-				context.Respond(&messages.Response{Type: messages.SUCCESS})
+				context.Send(pid, &tree.Find{Key: int(msg.Key), RequestFrom: context.Sender()})
+				context.Respond(&messages.Response{Value: msg.Value, Type: messages.FIND})
 			} else {
 				accessDenied(context, context.Sender())
 			}

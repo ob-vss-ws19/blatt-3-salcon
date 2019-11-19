@@ -67,15 +67,15 @@ func (state *Node) Receive(context actor.Context) {
 			fmt.Printf("\n# ADD: Maximum Key Val Left %d\n\n", state.MaxKeyVal)
 			for _, key := range keys {
 				// Rechts aufteilen
-				if key > state.MaxKeyVal {
+				if key < state.MaxKeyVal {
+					fmt.Printf("\n# ADD: Set %d left\n\n", key)
+					context.Send(state.LeftNode, &Add{Key: key, Val: state.Data[key]})
+					delete(state.Data, key)
+				} else {
 					fmt.Printf("\n# ADD: Set %d right\n\n", key)
 					context.Send(state.RightNode, &Add{Key: key, Val: state.Data[key]})
 					delete(state.Data, key)
 					// Links aufteilen
-				} else {
-					fmt.Printf("\n# ADD: Set %d left\n\n", key)
-					context.Send(state.LeftNode, &Add{Key: key, Val: state.Data[key]})
-					delete(state.Data, key)
 				}
 			}
 		}
@@ -92,10 +92,15 @@ func (state *Node) Receive(context actor.Context) {
 				context.Send(state.RightNode, msg)
 			}
 		} else if state.LeftNode == nil && state.RightNode == nil {
+			fmt.Printf("\n# FIND: Searching for Key %d\n", msg.Key)
+			fmt.Printf("\n# FIND: Searching in map %s\n", state.Data)
+
 			foundData := state.Data[msg.Key]
+			fmt.Printf("\n# FIND: Data found %s\n", foundData)
+
 			if foundData != "" {
-				context.Send(msg.RequestFrom, &messages.Response{Value: foundData, Type: messages.FIND, Key: int32(msg.Key)})
-				fmt.Printf("# FIND: Key %d found")
+				context.Send(msg.RequestFrom, &messages.Response{Key: int32(msg.Key), Value: foundData, Type: messages.FIND})
+				fmt.Printf("# FIND: Key %d found\n", msg.Key)
 			}
 		} else {
 			context.Send(msg.RequestFrom, &messages.Error{Message: "# FIND: Key not found"})

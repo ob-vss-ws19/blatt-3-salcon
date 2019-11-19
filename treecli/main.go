@@ -37,7 +37,7 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 			fmt.Printf("Token: %s\n", msg.Value)
 			wg.Done()
 		case messages.FIND:
-			fmt.Printf("Value: %s\n", msg.Key)
+			fmt.Printf("Value: %s\n", msg.Value)
 			wg.Done()
 		case messages.SUCCESS:
 			wg.Done()
