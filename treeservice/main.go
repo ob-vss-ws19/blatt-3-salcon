@@ -67,12 +67,30 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 				accessDenied(context, context.Sender())
 			}
 
-		case messages.DELETE:
-
 		case messages.TRAVERSE:
-
+			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
+				context.Send(pid, &tree.Traverse{Caller: context.Sender(), Start: pid})
+			} else {
+				accessDenied(context, context.Sender())
+			}
+		case messages.DELETE:
+			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
+				context.Send(pid, &tree.Delete{CurrentNode: pid})
+				delete(alltrees, msg.Id)
+				context.Respond(&messages.Response{Type: messages.SUCCESS})
+			} else {
+				accessDenied(context, context.Sender())
+			}
 		case messages.ALLTREES:
+			tmp := ""
+			for k := range alltrees {
+				tmp += fmt.Sprintf("%d", k) + ", "
+			}
+			if len(tmp) > 2 {
+				tmp = tmp[:len(tmp)-2]
+			}
 
+			context.Respond(&messages.Response{Type: messages.ALLTREES, Value: tmp})
 		}
 
 	}
