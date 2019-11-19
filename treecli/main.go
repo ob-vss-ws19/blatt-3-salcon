@@ -80,6 +80,9 @@ func main() {
 	} else {
 		remotePid = pidResp.Pid
 		//handle commands
+		fmt.Println("Got these Args:")
+		fmt.Println(flag.Args())
+
 		switch flag.Args()[0] {
 		case "newtree":
 			newTree()
@@ -105,7 +108,8 @@ func main() {
 
 //function definitions for every command
 func search() {
-	if len(flag.Args()) != 2 || isNotValid(id, token) {
+	fmt.Println("Length ", len(flag.Args()))
+	if len(flag.Args()) != 2 || isNotValid(*id, *token) {
 		handleError()
 		return
 	}
@@ -114,7 +118,7 @@ func search() {
 }
 
 func insert() {
-	if len(flag.Args()) != 3 || isNotValid(id, token) {
+	if len(flag.Args()) != 3 || isNotValid(*id, *token) {
 		handleError()
 		return
 	} else {
@@ -124,7 +128,7 @@ func insert() {
 }
 
 func remove() {
-	if len(flag.Args()) != 2 || isNotValid(id, token) {
+	if len(flag.Args()) != 2 || isNotValid(*id, *token) {
 		handleError()
 		return
 	}
@@ -133,7 +137,7 @@ func remove() {
 }
 
 func traverse() {
-	if len(flag.Args()) > 1 || isNotValid(id, token) {
+	if len(flag.Args()) > 1 || isNotValid(*id, *token) {
 		handleError()
 		return
 	}
@@ -158,7 +162,7 @@ func newTree() {
 }
 
 func deleteTree() {
-	if len(flag.Args()) > 1 || isNotValid(id, token) {
+	if len(flag.Args()) > 1 || isNotValid(*id, *token) {
 		handleError()
 		return
 	}
@@ -172,8 +176,9 @@ func handleError() {
 }
 
 //bool function for checking if id and token are given
-func isNotValid(id *int, token *string) bool {
-	if *id == -1 || *token == "" {
+func isNotValid(id int, token string) bool {
+	if id == -1 || token == "" {
+		fmt.Printf("ID: %d and Token: %d not valid\n", id, token)
 		return true
 	}
 	return false

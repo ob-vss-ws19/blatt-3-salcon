@@ -15,15 +15,12 @@ type TreeServiceActor struct {
 }
 
 var createdID = 1
-var alltrees = make(map[int]*actor.PID)
-var tokens = make(map[int]string)
+var alltrees = make(map[int32]map[string]*actor.PID)
 
 // Kümmert sich darum, dass die Funktionalitäen
 func (state *TreeServiceActor) Receive(context actor.Context) {
-	fmt.Println(context.Message())
 	switch msg := context.Message().(type) {
 	case *messages.Request:
-		fmt.Println("hi")
 		switch msg.Type {
 
 		case messages.CREATETREE:
@@ -41,15 +38,21 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 			props := actor.PropsFromProducer(func() actor.Actor {
 				return &tree.Node{LeafSize: int(msg.LeafSize)}
 			})
-			newToken := newToken()
+			newToken := getNewToken()
 
 			pid := context.Spawn(props)
-			alltrees[newid] = pid
-			tokens[newid] = newToken
+			alltrees[int32(newid)] = make(map[string]*actor.PID)
+			alltrees[int32(newid)][newToken] = pid
 
 			context.Respond(&messages.Response{Key: int32(newid), Value: newToken, Type: messages.CREATETREE})
 
 		case messages.FIND:
+			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
+				context.Send(pid, &tree.Add{Key: int(msg.Key), Val: msg.Value})
+				context.Respond(&messages.Response{Type: messages.SUCCESS})
+			} else {
+				accessDenied(context, context.Sender())
+			}
 
 		case messages.ADD:
 
@@ -66,16 +69,28 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 	}
 }
 
+func pidAccess(Id int32, token string) *actor.PID {
+	pid := alltrees[Id][token]
+	if pid == nil {
+		return nil
+	}
+	return pid
+}
+
 func getTreeServiceActor() actor.Actor {
 	fmt.Printf("# Tree-Service-Actor is ready\n")
 	return &TreeServiceActor{}
 }
 
 // Generates new Token, 4 Bytes long
-func newToken() string {
+func getNewToken() string {
 	bytes := make([]byte, 4)
 	rand.Read(bytes)
 	return fmt.Sprintf("%x", bytes)
+}
+
+func accessDenied(context actor.Context, pid *actor.PID) {
+	context.Send(pid, &messages.Error{Message: "Access Denied: Wrong token or id"})
 }
 
 var bind = flag.String("bind", "localhost:8093", "Bind to address")
