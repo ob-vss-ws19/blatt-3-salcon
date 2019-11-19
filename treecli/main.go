@@ -149,7 +149,7 @@ func newTree() {
 		return
 	}
 	tmp, _ := strconv.Atoi(flag.Args()[1])
-	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.CREATETREE, Id: int32(tmp)}, pid)
+	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.CREATETREE, LeafSize: int32(tmp)}, pid)
 }
 
 func deleteTree() {
