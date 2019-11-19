@@ -120,7 +120,7 @@ func accessDenied(context actor.Context, pid *actor.PID) {
 	context.Send(pid, &messages.Error{Message: "Access Denied: Wrong token or id"})
 }
 
-var bind = flag.String("bind", "localhost:8093", "Bind to address")
+var bind = flag.String("bind", "localhost:8090", "Bind to address")
 
 func main() {
 	var wg sync.WaitGroup
