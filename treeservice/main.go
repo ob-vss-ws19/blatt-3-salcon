@@ -1,13 +1,13 @@
 package main
 
 import (
-	"blatt-3-salcon/messages"
-	"blatt-3-salcon/tree"
 	"crypto/rand"
 	"flag"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"github.com/AsynkronIT/protoactor-go/remote"
+	"github.com/ob-vss-ws19/blatt-3-salcon/messages"
+	"github.com/ob-vss-ws19/blatt-3-salcon/tree"
 	"sync"
 )
 

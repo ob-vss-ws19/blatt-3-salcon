@@ -1,10 +1,10 @@
 package tree
 
 import (
-	"blatt-3-salcon/messages"
 	cr "crypto/rand"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
+	"github.com/ob-vss-ws19/blatt-3-salcon/messages"
 	mr "math/rand"
 	"sync"
 	"testing"
