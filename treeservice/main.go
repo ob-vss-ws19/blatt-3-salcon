@@ -24,13 +24,11 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 		switch msg.Type {
 
 		case messages.CREATETREE:
-			fmt.Println("createtree")
+			fmt.Printf("# CREATETREE: Created Tree with ID %d\n", createdID)
 
 			if msg.LeafSize <= 0 {
 				context.Respond(&messages.Error{"Leaf Size should be at least 1"})
 			}
-			fmt.Println(msg.Id)
-
 			//Neue ID erhalten für Node
 			newid := createdID
 			createdID++
@@ -48,15 +46,26 @@ func (state *TreeServiceActor) Receive(context actor.Context) {
 
 		case messages.FIND:
 			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
+				context.Send(pid, &tree.Find{Key: int(msg.Key)})
+				context.Respond(&messages.Response{Type: messages.SUCCESS})
+			} else {
+				accessDenied(context, context.Sender())
+			}
+		case messages.ADD:
+			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
 				context.Send(pid, &tree.Add{Key: int(msg.Key), Val: msg.Value})
 				context.Respond(&messages.Response{Type: messages.SUCCESS})
 			} else {
 				accessDenied(context, context.Sender())
 			}
 
-		case messages.ADD:
-
 		case messages.REMOVE:
+			if pid := pidAccess(msg.Id, msg.Token); pid != nil {
+				context.Send(pid, &tree.Remove{Key: int(msg.Key)})
+				context.Respond(&messages.Response{Type: messages.SUCCESS})
+			} else {
+				accessDenied(context, context.Sender())
+			}
 
 		case messages.DELETE:
 
