@@ -166,8 +166,7 @@ func deleteTree() {
 		handleError()
 		return
 	}
-	tmp, _ := strconv.Atoi(flag.Args()[1])
-	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.REMOVE, Key: int32(tmp), Token: *token, Id: int32(*id)}, pid)
+	rootContext.RequestWithCustomSender(remotePid, &messages.Request{Type: messages.DELETE, Token: *token, Id: int32(*id)}, pid)
 }
 
 func handleError() {
