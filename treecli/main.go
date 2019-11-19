@@ -8,19 +8,22 @@ import (
 	"github.com/AsynkronIT/protoactor-go/remote"
 	"strconv"
 	"sync"
+	"time"
 )
 
 //Global Variables
 var (
+	flagBind   = flag.String("bind", "localhost:8092", "Bind to address")
+	flagRemote = flag.String("remote", "127.0.0.1:8093", "remote host:port")
+
 	id          *int
 	token       = flag.String("token", "", "tree token")
+	forceDelete = flag.Bool("no-preserve-tree", false, "force deletion of tree")
+
+	rootContext *actor.RootContext
 	pid         *actor.PID
 	remotePid   *actor.PID
-	wg          sync.WaitGroup //A WaitGroup waits for a collection of goroutines to finish.
-	flagBind    = flag.String("bind", "localhost:8090", "Bind to Address")
-	flagRemote  = flag.String("remote", "localhost:8091", "remote host:port")
-	forceDelete = flag.Bool("no-preserve-tree", false, "force deletion of tree")
-	rootContext *actor.RootContext
+	wg          sync.WaitGroup
 )
 
 type TreeCliActor struct{}
@@ -60,7 +63,8 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 // Command Line Interface
 func main() {
 	fmt.Println("Hello Tree-CLI!")
-	id = flag.Int("id",-1, "tree id")
+	id = flag.Int("id", -1, "tree id")
+	flag.Parse()
 	remote.Start(*flagBind)
 	//siehe folie
 	rootContext = actor.EmptyRootContext //initliaze empty root context
@@ -69,7 +73,7 @@ func main() {
 		return &TreeCliActor{}
 	})
 	pid = rootContext.Spawn(props) //starts actor after being created
-	pidResp, err := remote.SpawnNamed(*flagRemote, "remote", "treeService", 0);
+	pidResp, err := remote.SpawnNamed(*flagRemote, "remote", "treeService", 5*time.Second)
 	if err != nil {
 		//handle error
 		panic(err)
@@ -145,7 +149,7 @@ func trees() {
 }
 
 func newTree() {
-	if len(flag.Args()) != 5 {
+	if len(flag.Args()) < 1 {
 		handleError()
 		return
 	}

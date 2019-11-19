@@ -2,6 +2,7 @@ package main
 
 import (
 	"blatt-3-salcon/messages"
+	"blatt-3-salcon/tree"
 	"crypto/rand"
 	"flag"
 	"fmt"
@@ -15,29 +16,38 @@ type TreeServiceActor struct {
 
 var createdID = 1
 var alltrees = make(map[int]*actor.PID)
-var tokens = make(map[string]int)
+var tokens = make(map[int]string)
 
 // Kümmert sich darum, dass die Funktionalitäen
 func (state *TreeServiceActor) Receive(context actor.Context) {
+	fmt.Println(context.Message())
 	switch msg := context.Message().(type) {
 	case *messages.Request:
+		fmt.Println("hi")
 		switch msg.Type {
+
 		case messages.CREATETREE:
-			if msg.Id <= 0 {
+			fmt.Println("createtree")
+
+			if msg.LeafSize <= 0 {
 				context.Respond(&messages.Error{"Leaf Size should be at least 1"})
 			}
+			fmt.Println(msg.Id)
 
-			// Neue ID erhalten für Node
-			//newid := createdID
-			//createdID++
-			//
-			//props := actor.PropsFromProducer(func() actor.Actor {
-			//	return &tree.Node{ LeafSize: int(msg.LeafSize) }
-			//})
+			//Neue ID erhalten für Node
+			newid := createdID
+			createdID++
 
-			//pid := context.Spawn(props)
+			props := actor.PropsFromProducer(func() actor.Actor {
+				return &tree.Node{LeafSize: int(msg.LeafSize)}
+			})
+			newToken := newToken()
 
-			//alltrees[newid] =
+			pid := context.Spawn(props)
+			alltrees[newid] = pid
+			tokens[newid] = newToken
+
+			context.Respond(&messages.Response{Key: int32(newid), Value: newToken, Type: messages.CREATETREE})
 
 		case messages.FIND:
 
@@ -68,7 +78,7 @@ func newToken() string {
 	return fmt.Sprintf("%x", bytes)
 }
 
-var bind = flag.String("bind", "localhost:8090", "Bind to address")
+var bind = flag.String("bind", "localhost:8093", "Bind to address")
 
 func main() {
 	var wg sync.WaitGroup
@@ -76,5 +86,5 @@ func main() {
 	defer wg.Wait()
 	flag.Parse()
 	remote.Start(*bind)
-	remote.Register("treeservice", actor.PropsFromProducer(getTreeServiceActor))
+	remote.Register("treeService", actor.PropsFromProducer(getTreeServiceActor))
 }
