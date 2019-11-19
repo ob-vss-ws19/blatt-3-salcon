@@ -105,7 +105,7 @@ func main() {
 
 //function definitions for every command
 func search() {
-	if len(flag.Args()) != 1 || isNotValid(id, token) {
+	if len(flag.Args()) != 2 || isNotValid(id, token) {
 		handleError()
 		return
 	}
@@ -114,7 +114,7 @@ func search() {
 }
 
 func insert() {
-	if len(flag.Args()) != 2 || isNotValid(id, token) {
+	if len(flag.Args()) != 3 || isNotValid(id, token) {
 		handleError()
 		return
 	} else {
@@ -124,7 +124,7 @@ func insert() {
 }
 
 func remove() {
-	if len(flag.Args()) != 3 || isNotValid(id, token) {
+	if len(flag.Args()) != 2 || isNotValid(id, token) {
 		handleError()
 		return
 	}
@@ -141,7 +141,7 @@ func traverse() {
 }
 
 func trees() {
-	if len(flag.Args()) != 4 {
+	if len(flag.Args()) != 1 {
 		handleError()
 		return
 	}
@@ -158,7 +158,7 @@ func newTree() {
 }
 
 func deleteTree() {
-	if len(flag.Args()) != 6 || isNotValid(id, token) {
+	if len(flag.Args()) > 1 || isNotValid(id, token) {
 		handleError()
 		return
 	}
