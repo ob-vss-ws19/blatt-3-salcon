@@ -60,6 +60,7 @@ func (state *TreeCliActor) Receive(context actor.Context) {
 // Command Line Interface
 func main() {
 	fmt.Println("Hello Tree-CLI!")
+	id = flag.Int("id",-1, "tree id")
 	remote.Start(*flagBind)
 	//siehe folie
 	rootContext = actor.EmptyRootContext //initliaze empty root context
