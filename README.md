@@ -16,7 +16,7 @@
     `treeservice` (entspricht dem Argument von `--name`) im Netzwerk `actors`:
 
     ```
-    sudo docker run --rm --net actors --name treeservice terraform.cs.hm.edu:5043/ob-vss-ws19-blatt-3-salcon:development-docker-treeservice --bind="treeservice.actors:8090"
+    sudo docker run --rm --net actors --name treeservice terraform.cs.hm.edu:5043/ob-vss-ws19-blatt-3-salcon:development-treeservice --bind="treeservice.actors:8090"
     ```
 
     Damit das funktioniert, müssen Sie folgendes erst im Tree-Service implementieren:
@@ -30,7 +30,7 @@
     dem Namen und Port `treeservice.actors:8090`:
 
     ```
-    sudo docker run --rm --net actors --name treecli terraform.cs.hm.edu:5043/ob-vss-ws19-blatt-3-salcon:development-docker-treecli --bind="treecli.actors:8091" --remote="treeservice.actors:8090" ARGUMENTE
+    sudo docker run --rm --net actors --name treecli terraform.cs.hm.edu:5043/ob-vss-ws19-blatt-3-salcon:development-treecli --bind="treecli.actors:8091" --remote="treeservice.actors:8090" ARGUMENTE
 
     ```
 
