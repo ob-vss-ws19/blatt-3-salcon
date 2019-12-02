@@ -10,6 +10,7 @@ import (
 	math "math"
 	math_bits "math/bits"
 	reflect "reflect"
+	strconv "strconv"
 	strings "strings"
 )
 
@@ -24,20 +25,60 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type HelloWorld struct {
+type Usage int32
+
+const (
+	CREATETREE Usage = 0
+	ADD        Usage = 1
+	FIND       Usage = 2
+	REMOVE     Usage = 3
+	TRAVERSE   Usage = 4
+	DELETE     Usage = 5
+	SUCCESS    Usage = 6
+	ALLTREES   Usage = 7
+)
+
+var Usage_name = map[int32]string{
+	0: "CREATETREE",
+	1: "ADD",
+	2: "FIND",
+	3: "REMOVE",
+	4: "TRAVERSE",
+	5: "DELETE",
+	6: "SUCCESS",
+	7: "ALLTREES",
 }
 
-func (m *HelloWorld) Reset()      { *m = HelloWorld{} }
-func (*HelloWorld) ProtoMessage() {}
-func (*HelloWorld) Descriptor() ([]byte, []int) {
+var Usage_value = map[string]int32{
+	"CREATETREE": 0,
+	"ADD":        1,
+	"FIND":       2,
+	"REMOVE":     3,
+	"TRAVERSE":   4,
+	"DELETE":     5,
+	"SUCCESS":    6,
+	"ALLTREES":   7,
+}
+
+func (Usage) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_cb3889276909882a, []int{0}
 }
-func (m *HelloWorld) XXX_Unmarshal(b []byte) error {
+
+type Error struct {
+	Message string `protobuf:"bytes,1,opt,name=Message,proto3" json:"Message,omitempty"`
+}
+
+func (m *Error) Reset()      { *m = Error{} }
+func (*Error) ProtoMessage() {}
+func (*Error) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cb3889276909882a, []int{0}
+}
+func (m *Error) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *HelloWorld) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Error) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_HelloWorld.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Error.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -47,44 +88,263 @@ func (m *HelloWorld) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *HelloWorld) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HelloWorld.Merge(m, src)
+func (m *Error) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Error.Merge(m, src)
 }
-func (m *HelloWorld) XXX_Size() int {
+func (m *Error) XXX_Size() int {
 	return m.Size()
 }
-func (m *HelloWorld) XXX_DiscardUnknown() {
-	xxx_messageInfo_HelloWorld.DiscardUnknown(m)
+func (m *Error) XXX_DiscardUnknown() {
+	xxx_messageInfo_Error.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_HelloWorld proto.InternalMessageInfo
+var xxx_messageInfo_Error proto.InternalMessageInfo
+
+func (m *Error) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+type Request struct {
+	Token    string `protobuf:"bytes,1,opt,name=Token,proto3" json:"Token,omitempty"`
+	Id       int32  `protobuf:"varint,2,opt,name=Id,proto3" json:"Id,omitempty"`
+	Type     Usage  `protobuf:"varint,3,opt,name=Type,proto3,enum=messages.Usage" json:"Type,omitempty"`
+	Key      int32  `protobuf:"varint,4,opt,name=Key,proto3" json:"Key,omitempty"`
+	Value    string `protobuf:"bytes,5,opt,name=Value,proto3" json:"Value,omitempty"`
+	LeafSize int32  `protobuf:"varint,6,opt,name=LeafSize,proto3" json:"LeafSize,omitempty"`
+}
+
+func (m *Request) Reset()      { *m = Request{} }
+func (*Request) ProtoMessage() {}
+func (*Request) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cb3889276909882a, []int{1}
+}
+func (m *Request) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Request.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Request) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Request.Merge(m, src)
+}
+func (m *Request) XXX_Size() int {
+	return m.Size()
+}
+func (m *Request) XXX_DiscardUnknown() {
+	xxx_messageInfo_Request.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Request proto.InternalMessageInfo
+
+func (m *Request) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *Request) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *Request) GetType() Usage {
+	if m != nil {
+		return m.Type
+	}
+	return CREATETREE
+}
+
+func (m *Request) GetKey() int32 {
+	if m != nil {
+		return m.Key
+	}
+	return 0
+}
+
+func (m *Request) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+func (m *Request) GetLeafSize() int32 {
+	if m != nil {
+		return m.LeafSize
+	}
+	return 0
+}
+
+type Response struct {
+	Key   int32  `protobuf:"varint,1,opt,name=Key,proto3" json:"Key,omitempty"`
+	Value string `protobuf:"bytes,2,opt,name=Value,proto3" json:"Value,omitempty"`
+	Type  Usage  `protobuf:"varint,3,opt,name=Type,proto3,enum=messages.Usage" json:"Type,omitempty"`
+}
+
+func (m *Response) Reset()      { *m = Response{} }
+func (*Response) ProtoMessage() {}
+func (*Response) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cb3889276909882a, []int{2}
+}
+func (m *Response) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Response.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Response) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Response.Merge(m, src)
+}
+func (m *Response) XXX_Size() int {
+	return m.Size()
+}
+func (m *Response) XXX_DiscardUnknown() {
+	xxx_messageInfo_Response.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Response proto.InternalMessageInfo
+
+func (m *Response) GetKey() int32 {
+	if m != nil {
+		return m.Key
+	}
+	return 0
+}
+
+func (m *Response) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+func (m *Response) GetType() Usage {
+	if m != nil {
+		return m.Type
+	}
+	return CREATETREE
+}
+
+type Traverse struct {
+	Values []*Response `protobuf:"bytes,1,rep,name=Values,proto3" json:"Values,omitempty"`
+}
+
+func (m *Traverse) Reset()      { *m = Traverse{} }
+func (*Traverse) ProtoMessage() {}
+func (*Traverse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cb3889276909882a, []int{3}
+}
+func (m *Traverse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Traverse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Traverse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Traverse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Traverse.Merge(m, src)
+}
+func (m *Traverse) XXX_Size() int {
+	return m.Size()
+}
+func (m *Traverse) XXX_DiscardUnknown() {
+	xxx_messageInfo_Traverse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Traverse proto.InternalMessageInfo
+
+func (m *Traverse) GetValues() []*Response {
+	if m != nil {
+		return m.Values
+	}
+	return nil
+}
 
 func init() {
-	proto.RegisterType((*HelloWorld)(nil), "messages.HelloWorld")
+	proto.RegisterEnum("messages.Usage", Usage_name, Usage_value)
+	proto.RegisterType((*Error)(nil), "messages.Error")
+	proto.RegisterType((*Request)(nil), "messages.Request")
+	proto.RegisterType((*Response)(nil), "messages.Response")
+	proto.RegisterType((*Traverse)(nil), "messages.Traverse")
 }
 
 func init() { proto.RegisterFile("tree.proto", fileDescriptor_cb3889276909882a) }
 
 var fileDescriptor_cb3889276909882a = []byte{
-	// 122 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x29, 0x4a, 0x4d,
-	0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xc8, 0x4d, 0x2d, 0x2e, 0x4e, 0x4c, 0x4f, 0x2d,
-	0x56, 0xe2, 0xe1, 0xe2, 0xf2, 0x48, 0xcd, 0xc9, 0xc9, 0x0f, 0xcf, 0x2f, 0xca, 0x49, 0x71, 0x32,
-	0xb9, 0xf0, 0x50, 0x8e, 0xe1, 0xc6, 0x43, 0x39, 0x86, 0x0f, 0x0f, 0xe5, 0x18, 0x1b, 0x1e, 0xc9,
-	0x31, 0xae, 0x78, 0x24, 0xc7, 0x78, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e,
-	0xc9, 0x31, 0xbe, 0x78, 0x24, 0xc7, 0xf0, 0xe1, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x17,
-	0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x90, 0xc4, 0x06, 0x36, 0xd4, 0x18, 0x10, 0x00, 0x00,
-	0xff, 0xff, 0x75, 0x7e, 0xae, 0x67, 0x62, 0x00, 0x00, 0x00,
+	// 383 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xbd, 0x6e, 0xdb, 0x30,
+	0x14, 0x85, 0x45, 0xfd, 0xf7, 0xba, 0x70, 0x09, 0xa2, 0x03, 0xd1, 0x81, 0x50, 0xd5, 0x45, 0xf0,
+	0xe0, 0xc1, 0x2d, 0xba, 0xab, 0x16, 0x0b, 0x18, 0x95, 0x5b, 0x80, 0x92, 0xdd, 0x59, 0x85, 0xd9,
+	0x20, 0x70, 0x62, 0x39, 0xa2, 0x1d, 0xc0, 0x99, 0xf2, 0x08, 0x19, 0xf3, 0x08, 0x79, 0x94, 0x8c,
+	0x1e, 0x3d, 0xc6, 0xf2, 0x92, 0xd1, 0x8f, 0x10, 0x48, 0xfe, 0x49, 0x86, 0x0c, 0x99, 0xc8, 0xc3,
+	0x7b, 0xce, 0x77, 0x38, 0x5c, 0x80, 0x59, 0x21, 0x65, 0x7b, 0x5a, 0xe4, 0xb3, 0x9c, 0xb8, 0xe7,
+	0x52, 0xa9, 0xec, 0x44, 0x2a, 0xff, 0x33, 0x58, 0xbc, 0x28, 0xf2, 0x82, 0x50, 0x70, 0xfa, 0xbb,
+	0x47, 0x8a, 0x3c, 0x14, 0xbc, 0x13, 0x07, 0xe9, 0xdf, 0x22, 0x70, 0x84, 0xbc, 0x98, 0x4b, 0x35,
+	0x23, 0x1f, 0xc1, 0x4a, 0xf3, 0xb1, 0x9c, 0xec, 0x3d, 0x3b, 0x41, 0x9a, 0xa0, 0xf7, 0x46, 0x54,
+	0xf7, 0x50, 0x60, 0x09, 0xbd, 0x37, 0x22, 0x5f, 0xc0, 0x4c, 0x17, 0x53, 0x49, 0x0d, 0x0f, 0x05,
+	0xcd, 0xce, 0x87, 0xf6, 0xa1, 0xad, 0x3d, 0xa8, 0x0e, 0x51, 0x0f, 0x09, 0x06, 0xe3, 0x97, 0x5c,
+	0x50, 0xb3, 0x4e, 0x55, 0xd7, 0x0a, 0x3e, 0xcc, 0xce, 0xe6, 0x92, 0x5a, 0x3b, 0x78, 0x2d, 0xc8,
+	0x27, 0x70, 0x63, 0x99, 0xfd, 0x4f, 0x4e, 0xaf, 0x24, 0xb5, 0x6b, 0xf3, 0x51, 0xfb, 0x7f, 0xc1,
+	0x15, 0x52, 0x4d, 0xf3, 0x89, 0x3a, 0xf2, 0xd0, 0x2b, 0x3c, 0xfd, 0x25, 0xef, 0x2d, 0x9f, 0xf3,
+	0xbf, 0x83, 0x9b, 0x16, 0xd9, 0xa5, 0x2c, 0x94, 0x24, 0x2d, 0xb0, 0xeb, 0xa4, 0xa2, 0xc8, 0x33,
+	0x82, 0x46, 0x87, 0x3c, 0x47, 0x0e, 0xe5, 0x62, 0xef, 0x68, 0x8d, 0xc1, 0xaa, 0x31, 0xa4, 0x09,
+	0xd0, 0x15, 0x3c, 0x4c, 0x79, 0x2a, 0x38, 0xc7, 0x1a, 0x71, 0xc0, 0x08, 0xa3, 0x08, 0x23, 0xe2,
+	0x82, 0xf9, 0xb3, 0xf7, 0x3b, 0xc2, 0x3a, 0x01, 0xb0, 0x05, 0xef, 0xff, 0x19, 0x72, 0x6c, 0x90,
+	0xf7, 0xe0, 0xa6, 0x22, 0x1c, 0x72, 0x91, 0x70, 0x6c, 0x56, 0x93, 0x88, 0xc7, 0x3c, 0xe5, 0xd8,
+	0x22, 0x0d, 0x70, 0x92, 0x41, 0xb7, 0xcb, 0x93, 0x04, 0xdb, 0x95, 0x2d, 0x8c, 0xe3, 0x0a, 0x99,
+	0x60, 0xe7, 0xc7, 0xb7, 0xe5, 0x9a, 0x69, 0xab, 0x35, 0xd3, 0xb6, 0x6b, 0x86, 0xae, 0x4b, 0x86,
+	0xee, 0x4a, 0x86, 0xee, 0x4b, 0x86, 0x96, 0x25, 0x43, 0x0f, 0x25, 0x43, 0x8f, 0x25, 0xd3, 0xb6,
+	0x25, 0x43, 0x37, 0x1b, 0xa6, 0x2d, 0x37, 0x4c, 0x5b, 0x6d, 0x98, 0xf6, 0xcf, 0xae, 0x57, 0xe0,
+	0xeb, 0x53, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5a, 0xb6, 0xb7, 0x79, 0x10, 0x02, 0x00, 0x00,
 }
 
-func (this *HelloWorld) Equal(that interface{}) bool {
+func (x Usage) String() string {
+	s, ok := Usage_name[int32(x)]
+	if ok {
+		return s
+	}
+	return strconv.Itoa(int(x))
+}
+func (this *Error) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*HelloWorld)
+	that1, ok := that.(*Error)
 	if !ok {
-		that2, ok := that.(HelloWorld)
+		that2, ok := that.(Error)
 		if ok {
 			that1 = &that2
 		} else {
@@ -96,14 +356,155 @@ func (this *HelloWorld) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
+	if this.Message != that1.Message {
+		return false
+	}
 	return true
 }
-func (this *HelloWorld) GoString() string {
+func (this *Request) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Request)
+	if !ok {
+		that2, ok := that.(Request)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Token != that1.Token {
+		return false
+	}
+	if this.Id != that1.Id {
+		return false
+	}
+	if this.Type != that1.Type {
+		return false
+	}
+	if this.Key != that1.Key {
+		return false
+	}
+	if this.Value != that1.Value {
+		return false
+	}
+	if this.LeafSize != that1.LeafSize {
+		return false
+	}
+	return true
+}
+func (this *Response) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Response)
+	if !ok {
+		that2, ok := that.(Response)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Key != that1.Key {
+		return false
+	}
+	if this.Value != that1.Value {
+		return false
+	}
+	if this.Type != that1.Type {
+		return false
+	}
+	return true
+}
+func (this *Traverse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*Traverse)
+	if !ok {
+		that2, ok := that.(Traverse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Values) != len(that1.Values) {
+		return false
+	}
+	for i := range this.Values {
+		if !this.Values[i].Equal(that1.Values[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *Error) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 4)
-	s = append(s, "&messages.HelloWorld{")
+	s := make([]string, 0, 5)
+	s = append(s, "&messages.Error{")
+	s = append(s, "Message: "+fmt.Sprintf("%#v", this.Message)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *Request) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 10)
+	s = append(s, "&messages.Request{")
+	s = append(s, "Token: "+fmt.Sprintf("%#v", this.Token)+",\n")
+	s = append(s, "Id: "+fmt.Sprintf("%#v", this.Id)+",\n")
+	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
+	s = append(s, "Key: "+fmt.Sprintf("%#v", this.Key)+",\n")
+	s = append(s, "Value: "+fmt.Sprintf("%#v", this.Value)+",\n")
+	s = append(s, "LeafSize: "+fmt.Sprintf("%#v", this.LeafSize)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *Response) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&messages.Response{")
+	s = append(s, "Key: "+fmt.Sprintf("%#v", this.Key)+",\n")
+	s = append(s, "Value: "+fmt.Sprintf("%#v", this.Value)+",\n")
+	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *Traverse) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&messages.Traverse{")
+	if this.Values != nil {
+		s = append(s, "Values: "+fmt.Sprintf("%#v", this.Values)+",\n")
+	}
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -115,7 +516,7 @@ func valueToGoStringTree(v interface{}, typ string) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
 }
-func (m *HelloWorld) Marshal() (dAtA []byte, err error) {
+func (m *Error) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -125,16 +526,157 @@ func (m *HelloWorld) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *HelloWorld) MarshalTo(dAtA []byte) (int, error) {
+func (m *Error) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *HelloWorld) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Error) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintTree(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Request) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Request) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Request) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.LeafSize != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.LeafSize))
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintTree(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Key != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.Key))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Type != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.Type))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Id != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Token) > 0 {
+		i -= len(m.Token)
+		copy(dAtA[i:], m.Token)
+		i = encodeVarintTree(dAtA, i, uint64(len(m.Token)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Response) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Response) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Response) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Type != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.Type))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Value) > 0 {
+		i -= len(m.Value)
+		copy(dAtA[i:], m.Value)
+		i = encodeVarintTree(dAtA, i, uint64(len(m.Value)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Key != 0 {
+		i = encodeVarintTree(dAtA, i, uint64(m.Key))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Traverse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Traverse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Traverse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Values) > 0 {
+		for iNdEx := len(m.Values) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Values[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTree(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -149,12 +691,79 @@ func encodeVarintTree(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *HelloWorld) Size() (n int) {
+func (m *Error) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovTree(uint64(l))
+	}
+	return n
+}
+
+func (m *Request) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Token)
+	if l > 0 {
+		n += 1 + l + sovTree(uint64(l))
+	}
+	if m.Id != 0 {
+		n += 1 + sovTree(uint64(m.Id))
+	}
+	if m.Type != 0 {
+		n += 1 + sovTree(uint64(m.Type))
+	}
+	if m.Key != 0 {
+		n += 1 + sovTree(uint64(m.Key))
+	}
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovTree(uint64(l))
+	}
+	if m.LeafSize != 0 {
+		n += 1 + sovTree(uint64(m.LeafSize))
+	}
+	return n
+}
+
+func (m *Response) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Key != 0 {
+		n += 1 + sovTree(uint64(m.Key))
+	}
+	l = len(m.Value)
+	if l > 0 {
+		n += 1 + l + sovTree(uint64(l))
+	}
+	if m.Type != 0 {
+		n += 1 + sovTree(uint64(m.Type))
+	}
+	return n
+}
+
+func (m *Traverse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Values) > 0 {
+		for _, e := range m.Values {
+			l = e.Size()
+			n += 1 + l + sovTree(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -164,11 +773,54 @@ func sovTree(x uint64) (n int) {
 func sozTree(x uint64) (n int) {
 	return sovTree(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (this *HelloWorld) String() string {
+func (this *Error) String() string {
 	if this == nil {
 		return "nil"
 	}
-	s := strings.Join([]string{`&HelloWorld{`,
+	s := strings.Join([]string{`&Error{`,
+		`Message:` + fmt.Sprintf("%v", this.Message) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *Request) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&Request{`,
+		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
+		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
+		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
+		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`LeafSize:` + fmt.Sprintf("%v", this.LeafSize) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *Response) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&Response{`,
+		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
+		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
+		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *Traverse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	repeatedStringForValues := "[]*Response{"
+	for _, f := range this.Values {
+		repeatedStringForValues += strings.Replace(f.String(), "Response", "Response", 1) + ","
+	}
+	repeatedStringForValues += "}"
+	s := strings.Join([]string{`&Traverse{`,
+		`Values:` + repeatedStringForValues + `,`,
 		`}`,
 	}, "")
 	return s
@@ -181,7 +833,7 @@ func valueToStringTree(v interface{}) string {
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
 }
-func (m *HelloWorld) Unmarshal(dAtA []byte) error {
+func (m *Error) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -204,12 +856,447 @@ func (m *HelloWorld) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: HelloWorld: wiretype end group for non-group")
+			return fmt.Errorf("proto: Error: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: HelloWorld: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Error: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTree
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTree
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTree(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Request) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTree
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Request: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Request: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTree
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTree
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			m.Type = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Type |= Usage(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			m.Key = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Key |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTree
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTree
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LeafSize", wireType)
+			}
+			m.LeafSize = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LeafSize |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTree(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Response) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTree
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Response: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Response: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			m.Key = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Key |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTree
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTree
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			m.Type = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Type |= Usage(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTree(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTree
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Traverse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTree
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Traverse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Traverse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTree
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTree
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTree
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Values = append(m.Values, &Response{})
+			if err := m.Values[len(m.Values)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTree(dAtA[iNdEx:])

@@ -1,4 +1,37 @@
 syntax = "proto3";
+
 package messages;
 
-message HelloWorld {}
+message Error {
+    string Message = 1;
+}
+
+enum Usage {
+    CREATETREE = 0;
+    ADD = 1;
+    FIND = 2;
+    REMOVE = 3;
+    TRAVERSE = 4;
+    DELETE = 5;
+    SUCCESS = 6;
+    ALLTREES = 7;
+}
+
+message Request {
+    string Token = 1;
+    int32 Id = 2;
+    Usage Type = 3;
+    int32 Key = 4;
+    string Value = 5;
+    int32 LeafSize = 6;
+}
+
+message Response {
+    int32 Key = 1;
+    string Value = 2;
+    Usage Type = 3;
+}
+
+message Traverse {
+    repeated Response Values = 1;
+}
